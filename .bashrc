@@ -130,10 +130,12 @@ if ! shopt -oq posix; then
   fi
 fi
 
-# Weather by us zip code - Can be called two ways # weather 50315 # weather "Des Moines"
-weather ()
-{
-  declare -a WEATHERARRAY
-  WEATHERARRAY=( `elinks -dump "http://www.google.com/search?hl=en&lr=&client=firefox-a&rls=org.mozilla%3Aen-US%3Aofficial&q=weather+${1}&btnG=Search" | grep -A 5 -m 1 "Weather for" | sed 's;\[26\]Add to iGoogle\[27\]IMG;;g'`)
-  echo ${WEATHERARRAY[@]}
-}
+# Clima con wttr.in. Sin argumentos usa tu ubicación aproximada (por IP).
+#   weather              -> pronóstico de tu ubicación
+#   weather Ciudad Juarez  -> pronóstico de esa ciudad
+#   weather0 Ciudad Juarez -> solo el clima actual
+weather ()  { local lugar="$*"; curl -s "wttr.in/${lugar// /+}?lang=es"; }
+weather0 () { local lugar="$*"; curl -s "wttr.in/${lugar// /+}?0&lang=es"; }
+
+# Binarios instalados por el usuario (Claude Code, etc.)
+export PATH="$HOME/.local/bin:$PATH"
