@@ -34,9 +34,13 @@ foreach ($app in $apps) {
 
 # --- WSL + distro
 Write-Host "`n==> WSL" -ForegroundColor Cyan
-# 'wsl --list' sale en UTF-16, por eso se limpian los caracteres nulos
-$instaladas = (wsl.exe --list --quiet 2>$null) -replace "`0", "" |
-    ForEach-Object { $_.Trim() } | Where-Object { $_ }
+# Las distros instaladas se leen del registro: llamar a 'wsl.exe --list' en una
+# máquina sin WSL imprime un aviso en la consola que no se puede ocultar.
+$lxss = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Lxss"
+$instaladas = @()
+if (Test-Path $lxss) {
+    $instaladas = Get-ChildItem $lxss | ForEach-Object { (Get-ItemProperty $_.PSPath).DistributionName }
+}
 
 if ($instaladas -notcontains $Distro) {
     Write-Host "    Instalando WSL y $Distro..."
